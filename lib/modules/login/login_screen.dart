@@ -1,25 +1,26 @@
-import 'dart:ui';
 
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shop_app/modules/login/cubit/cubit.dart';
 import 'package:shop_app/modules/login/cubit/states.dart';
 import 'package:shop_app/modules/register/register_screen.dart';
 import 'package:shop_app/network/local/cache_helper.dart';
+import 'package:shop_app/shared/app_cubit/cubit.dart';
 import 'package:shop_app/shared/components/components.dart';
+import 'package:shop_app/shared/components/constants.dart';
 
 import '../../layout/shop_layout.dart';
 
 class LoginScreen extends StatelessWidget {
     LoginScreen({Key? key}) : super(key: key);
    final formKey = GlobalKey<FormState>();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    var emailController = TextEditingController();
-    var passwordController = TextEditingController();
+
 
     return BlocProvider(
       create: (BuildContext context) => LoginCubit(),
@@ -28,14 +29,20 @@ class LoginScreen extends StatelessWidget {
           if(state is LoginSuccessState){
             if(state.loginModel.status){
               print(state.loginModel.message);
-              print(state.loginModel.data?.token);
-              CacheHelper.saveData(key: 'token', value: state.loginModel.data?.token).then((value){
+              print(state.loginModel.data!.token);
+              CacheHelper.saveData(key: 'token', value: state.loginModel.data!.token).then((value){
+                token = state.loginModel.data!.token!;
+                AppCubit.get(context).getUserData();
+                AppCubit.get(context).getHomeData();
+                AppCubit.get(context).getFavorites();
+                AppCubit.get(context).getCategories();
+                AppCubit.get(context).currentIndex=0;
                 navigateAndFinish(context, const ShopLayout());
               });
             }
             else{
               print(state.loginModel.message);
-              showToast(text: state.loginModel.message, state:ToastStates.ERROR );
+              showToast(text: state.loginModel.message!, state:ToastStates.ERROR );
             }
           }
         },
@@ -74,6 +81,7 @@ class LoginScreen extends StatelessWidget {
                             if (value!.isEmpty) {
                               return 'please enter your email address';
                             }
+                            return null;
                           },
                           label: 'Email Address',
                           type: TextInputType.emailAddress,
@@ -101,6 +109,7 @@ class LoginScreen extends StatelessWidget {
                             if (value!.isEmpty) {
                               return 'password is too short';
                             }
+                            return null;
                           },
                           label: 'Password',
                           type: TextInputType.visiblePassword,
@@ -134,7 +143,7 @@ class LoginScreen extends StatelessWidget {
                             const Text("Don't have an account?"),
                             defaultTextButton(
                                 function: () {
-                                  navigateTo(context, const RegisterScreen());
+                                  navigateTo(context,  RegisterScreen());
                                 },
                                 text: 'register'),
                           ],

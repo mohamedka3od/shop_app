@@ -8,6 +8,7 @@ import 'package:shop_app/on_boarding/on_boarding_screen.dart';
 import 'package:shop_app/shared/app_cubit/cubit.dart';
 import 'package:shop_app/shared/app_cubit/states.dart';
 import 'package:shop_app/shared/bloc_observer.dart';
+import 'package:shop_app/shared/components/constants.dart';
 import 'package:shop_app/shared/styles/themes.dart';
 
 void main() {
@@ -19,10 +20,10 @@ void main() {
       bool isDark = CacheHelper.getData(key: 'isDark') ?? false;
       Widget widget;
       bool onBoarding = CacheHelper.getData(key: 'onBoarding') ?? false;
-      String? token = CacheHelper.getData(key: 'token');
+      token = CacheHelper.getData(key: 'token');
       if(onBoarding){
         if(token != null){
-          widget = ShopLayout();
+          widget = const ShopLayout();
         }
         else{
           widget = LoginScreen();
@@ -46,7 +47,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (BuildContext context) => AppCubit(isDark)),
+        BlocProvider(create: (BuildContext context) => AppCubit(isDark: isDark)..getHomeData()..getCategories()..getFavorites()..getUserData()),
       ],
       child: BlocConsumer<AppCubit, AppStates>(
         listener: (context, state) {},
@@ -54,7 +55,7 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: lightTheme,
-            themeMode: AppCubit.get(context).isDark ? ThemeMode.dark:ThemeMode.light,
+            themeMode: AppCubit.get(context).isDark! ? ThemeMode.dark:ThemeMode.light,
             darkTheme: darkTheme,
 
             home:  Directionality(

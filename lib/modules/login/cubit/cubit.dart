@@ -4,6 +4,7 @@ import 'package:shop_app/modules/login/cubit/states.dart';
 import 'package:shop_app/network/end_points.dart';
 import 'package:shop_app/network/remote/dio_helper.dart';
 import 'package:shop_app/models/login_model.dart';
+import 'package:shop_app/shared/components/constants.dart';
 
 class LoginCubit extends Cubit<LoginStates>
 {
@@ -30,7 +31,8 @@ class LoginCubit extends Cubit<LoginStates>
       loginModel = LoginModel.fromJson(value.data);
       print(loginModel.status);
       print(loginModel.message);
-      print(loginModel.data?.token);
+      print(loginModel.data!.token);
+      token = loginModel.data!.token!;
       emit(LoginSuccessState(loginModel));
     }).catchError((error){
       print(error.toString());
